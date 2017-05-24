@@ -1,9 +1,11 @@
 package com.wei.android.lib.fingerprintidentify;
 
 import android.app.Activity;
+import android.os.Build;
 
 import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint;
-import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint.FingerprintIdentifyExceptionListener;
+import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint
+        .FingerprintIdentifyExceptionListener;
 import com.wei.android.lib.fingerprintidentify.impl.AndroidFingerprint;
 import com.wei.android.lib.fingerprintidentify.impl.MeiZuFingerprint;
 import com.wei.android.lib.fingerprintidentify.impl.SamsungFingerprint;
@@ -41,7 +43,8 @@ public class FingerprintIdentify {
         this(activity, null);
     }
 
-    public FingerprintIdentify(Activity activity, FingerprintIdentifyExceptionListener exceptionListener) {
+    public FingerprintIdentify(Activity activity, FingerprintIdentifyExceptionListener
+            exceptionListener) {
         AndroidFingerprint androidFingerprint = new AndroidFingerprint(activity, exceptionListener);
         if (androidFingerprint.isHardwareEnable()) {
             mSubFingerprint = androidFingerprint;
@@ -60,16 +63,20 @@ public class FingerprintIdentify {
             }
         }
 
-        MeiZuFingerprint meiZuFingerprint = new MeiZuFingerprint(activity, exceptionListener);
-        if (meiZuFingerprint.isHardwareEnable()) {
-            mSubFingerprint = meiZuFingerprint;
-            if (meiZuFingerprint.isRegisteredFingerprint()) {
-                mFingerprint = meiZuFingerprint;
+        if (Build.BOARD.equals("Meizu")) {
+            MeiZuFingerprint meiZuFingerprint = new MeiZuFingerprint(activity, exceptionListener);
+            if (meiZuFingerprint.isHardwareEnable()) {
+                mSubFingerprint = meiZuFingerprint;
+                if (meiZuFingerprint.isRegisteredFingerprint()) {
+                    mFingerprint = meiZuFingerprint;
+                }
             }
         }
+
     }
 
-    public void startIdentify(int maxAvailableTimes, BaseFingerprint.FingerprintIdentifyListener listener) {
+    public void startIdentify(int maxAvailableTimes, BaseFingerprint.FingerprintIdentifyListener
+            listener) {
         if (!isFingerprintEnable()) {
             return;
         }
@@ -96,10 +103,12 @@ public class FingerprintIdentify {
     }
 
     public boolean isHardwareEnable() {
-        return isFingerprintEnable() || (mSubFingerprint != null && mSubFingerprint.isHardwareEnable());
+        return isFingerprintEnable() || (mSubFingerprint != null && mSubFingerprint
+                .isHardwareEnable());
     }
 
     public boolean isRegisteredFingerprint() {
-        return isFingerprintEnable() || (mSubFingerprint != null && mSubFingerprint.isRegisteredFingerprint());
+        return isFingerprintEnable() || (mSubFingerprint != null && mSubFingerprint
+                .isRegisteredFingerprint());
     }
 }

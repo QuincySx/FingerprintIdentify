@@ -1,5 +1,6 @@
 package com.wei.android.lib.fingerprintidentify.demo;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -40,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
                 mTvTips.append("\n" + exception.getLocalizedMessage());
             }
         });
-
-        mTvTips.append("create fingerprintIdentify");
+        mTvTips.append("手机品牌:" + Build.BRAND);
+        mTvTips.append("\ncreate fingerprintIdentify");
         mTvTips.append("\n硬件支持: " + mFingerprintIdentify.isHardwareEnable());
         mTvTips.append("\n注册指纹: " + mFingerprintIdentify.isRegisteredFingerprint());
         mTvTips.append("\n指纹可用: " + mFingerprintIdentify.isFingerprintEnable());
