@@ -28,6 +28,7 @@ import java.security.Signature;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 
+import static android.content.Context.FINGERPRINT_SERVICE;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 
 @RequiresApi(23)
@@ -36,7 +37,7 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 public final class FingerprintManagerCompatApi23 {
 
     private static FingerprintManager getFingerprintManagerOrNull(Context context) {
-        return context.getSystemService(FingerprintManager.class);
+        return (FingerprintManager) context.getSystemService(FINGERPRINT_SERVICE);
     }
 
     public static boolean hasEnrolledFingerprints(Context context) {
@@ -49,10 +50,12 @@ public final class FingerprintManagerCompatApi23 {
         return (fp != null) && fp.isHardwareDetected();
     }
 
-    public static void authenticate(Context context, CryptoObject crypto, int flags, Object cancel, AuthenticationCallback callback, Handler handler) {
+    public static void authenticate(Context context, CryptoObject crypto, int flags, Object
+            cancel, AuthenticationCallback callback, Handler handler) {
         final FingerprintManager fp = getFingerprintManagerOrNull(context);
         if (fp != null) {
-            fp.authenticate(wrapCryptoObject(crypto), (android.os.CancellationSignal) cancel, flags, wrapCallback(callback), handler);
+            fp.authenticate(wrapCryptoObject(crypto), (android.os.CancellationSignal) cancel,
+                    flags, wrapCallback(callback), handler);
         }
     }
 
@@ -84,7 +87,9 @@ public final class FingerprintManagerCompatApi23 {
         }
     }
 
-    private static FingerprintManager.AuthenticationCallback wrapCallback(final AuthenticationCallback callback) {
+    private static FingerprintManager.AuthenticationCallback wrapCallback(final
+                                                                          AuthenticationCallback
+                                                                                  callback) {
         return new FingerprintManager.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errMsgId, CharSequence errString) {
@@ -98,7 +103,8 @@ public final class FingerprintManagerCompatApi23 {
 
             @Override
             public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-                callback.onAuthenticationSucceeded(new AuthenticationResultInternal(unwrapCryptoObject(result.getCryptoObject())));
+                callback.onAuthenticationSucceeded(new AuthenticationResultInternal
+                        (unwrapCryptoObject(result.getCryptoObject())));
             }
 
             @Override

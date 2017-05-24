@@ -63,7 +63,7 @@ public class FingerprintIdentify {
             }
         }
 
-        if (Build.BOARD.equals("Meizu")) {
+        if (Build.BRAND.indexOf("Meizu") != -1) {
             MeiZuFingerprint meiZuFingerprint = new MeiZuFingerprint(activity, exceptionListener);
             if (meiZuFingerprint.isHardwareEnable()) {
                 mSubFingerprint = meiZuFingerprint;
