@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/FingerprintIdentify.iml" filepath="$PROJECT_DIR$/FingerprintIdentify.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FingerprintIdentifyDemo/FingerprintIdentifyDemo.iml" filepath="$PROJECT_DIR$/FingerprintIdentifyDemo/FingerprintIdentifyDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FingerprintIdentifyLib/FingerprintIdentifyLib.iml" filepath="$PROJECT_DIR$/FingerprintIdentifyLib/FingerprintIdentifyLib.iml" />
+    </modules>
+  </component>
+</project>

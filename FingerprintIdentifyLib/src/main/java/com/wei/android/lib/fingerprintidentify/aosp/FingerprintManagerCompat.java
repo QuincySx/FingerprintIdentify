@@ -43,12 +43,7 @@ public final class FingerprintManagerCompat {
     static final FingerprintManagerCompatImpl IMPL;
 
     static {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 23) {
-            IMPL = new Api23FingerprintManagerCompatImpl();
-        } else {
-            IMPL = new LegacyFingerprintManagerCompatImpl();
-        }
+        IMPL = new Api23FingerprintManagerCompatImpl();
     }
 
     public boolean hasEnrolledFingerprints() {
@@ -60,7 +55,8 @@ public final class FingerprintManagerCompat {
     }
 
     public void authenticate(@Nullable CryptoObject crypto, int flags,
-                             @Nullable CancellationSignal cancel, @NonNull AuthenticationCallback callback,
+                             @Nullable CancellationSignal cancel, @NonNull AuthenticationCallback
+                                     callback,
                              @Nullable Handler handler) {
         IMPL.authenticate(mContext, crypto, flags, cancel, callback, handler);
     }
@@ -135,10 +131,12 @@ public final class FingerprintManagerCompat {
 
         boolean isHardwareDetected(Context context);
 
-        void authenticate(Context context, CryptoObject crypto, int flags, CancellationSignal cancel, AuthenticationCallback callback, Handler handler);
+        void authenticate(Context context, CryptoObject crypto, int flags, CancellationSignal
+                cancel, AuthenticationCallback callback, Handler handler);
     }
 
-    private static class LegacyFingerprintManagerCompatImpl implements FingerprintManagerCompatImpl {
+    private static class LegacyFingerprintManagerCompatImpl implements
+            FingerprintManagerCompatImpl {
 
         public LegacyFingerprintManagerCompatImpl() {
         }
@@ -154,7 +152,9 @@ public final class FingerprintManagerCompat {
         }
 
         @Override
-        public void authenticate(Context context, CryptoObject crypto, int flags, CancellationSignal cancel, AuthenticationCallback callback, Handler handler) {
+        public void authenticate(Context context, CryptoObject crypto, int flags,
+                                 CancellationSignal cancel, AuthenticationCallback callback,
+                                 Handler handler) {
         }
     }
 
@@ -174,13 +174,16 @@ public final class FingerprintManagerCompat {
         }
 
         @Override
-        public void authenticate(Context context, CryptoObject crypto, int flags, CancellationSignal cancel,
+        public void authenticate(Context context, CryptoObject crypto, int flags,
+                                 CancellationSignal cancel,
                                  AuthenticationCallback callback, Handler handler) {
             FingerprintManagerCompatApi23.authenticate(context, wrapCryptoObject(crypto), flags,
-                    cancel != null ? cancel.getCancellationSignalObject() : null, wrapCallback(callback), handler);
+                    cancel != null ? cancel.getCancellationSignalObject() : null, wrapCallback
+                            (callback), handler);
         }
 
-        private static FingerprintManagerCompatApi23.CryptoObject wrapCryptoObject(CryptoObject cryptoObject) {
+        private static FingerprintManagerCompatApi23.CryptoObject wrapCryptoObject(CryptoObject
+                                                                                           cryptoObject) {
             if (cryptoObject == null) {
                 return null;
             } else if (cryptoObject.getCipher() != null) {
@@ -194,7 +197,8 @@ public final class FingerprintManagerCompat {
             }
         }
 
-        static CryptoObject unwrapCryptoObject(FingerprintManagerCompatApi23.CryptoObject cryptoObject) {
+        static CryptoObject unwrapCryptoObject(FingerprintManagerCompatApi23.CryptoObject
+                                                       cryptoObject) {
             if (cryptoObject == null) {
                 return null;
             } else if (cryptoObject.getCipher() != null) {
@@ -208,7 +212,8 @@ public final class FingerprintManagerCompat {
             }
         }
 
-        private static FingerprintManagerCompatApi23.AuthenticationCallback wrapCallback(final AuthenticationCallback callback) {
+        private static FingerprintManagerCompatApi23.AuthenticationCallback wrapCallback(final
+                                                                                         AuthenticationCallback callback) {
             return new FingerprintManagerCompatApi23.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationError(int errMsgId, CharSequence errString) {
@@ -221,8 +226,10 @@ public final class FingerprintManagerCompat {
                 }
 
                 @Override
-                public void onAuthenticationSucceeded(FingerprintManagerCompatApi23.AuthenticationResultInternal result) {
-                    callback.onAuthenticationSucceeded(new AuthenticationResult(unwrapCryptoObject(result.getCryptoObject())));
+                public void onAuthenticationSucceeded
+                        (FingerprintManagerCompatApi23.AuthenticationResultInternal result) {
+                    callback.onAuthenticationSucceeded(new AuthenticationResult
+                            (unwrapCryptoObject(result.getCryptoObject())));
                 }
 
                 @Override

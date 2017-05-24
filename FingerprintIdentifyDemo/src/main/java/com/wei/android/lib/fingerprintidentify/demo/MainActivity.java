@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mIsCalledStartIdentify = true;
-        mFingerprintIdentify = new FingerprintIdentify(this, new BaseFingerprint.FingerprintIdentifyExceptionListener() {
+        mFingerprintIdentify = new FingerprintIdentify(this, new BaseFingerprint
+                .FingerprintIdentifyExceptionListener() {
             @Override
             public void onCatchException(Throwable exception) {
                 mTvTips.append("\n" + exception.getLocalizedMessage());
@@ -41,31 +42,31 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mTvTips.append("create fingerprintIdentify");
-        mTvTips.append("\nisHardwareEnable: " + mFingerprintIdentify.isHardwareEnable());
-        mTvTips.append("\nisRegisteredFingerprint: " + mFingerprintIdentify.isRegisteredFingerprint());
-        mTvTips.append("\nisFingerprintEnable: " + mFingerprintIdentify.isFingerprintEnable());
+        mTvTips.append("\n硬件支持: " + mFingerprintIdentify.isHardwareEnable());
+        mTvTips.append("\n注册指纹: " + mFingerprintIdentify.isRegisteredFingerprint());
+        mTvTips.append("\n指纹可用: " + mFingerprintIdentify.isFingerprintEnable());
 
         if (!mFingerprintIdentify.isFingerprintEnable()) {
-            mTvTips.append("\nSorry →_→");
+            mTvTips.append("\n你的手机不支持此App指纹识别 →_→");
             return;
         }
 
-        mTvTips.append("\nstart identify\nput your finger on the sensor");
+        mTvTips.append("\n开始识别\n把你的手指放在传感器");
         mFingerprintIdentify.resumeIdentify();
         mFingerprintIdentify.startIdentify(3, new BaseFingerprint.FingerprintIdentifyListener() {
             @Override
             public void onSucceed() {
-                mTvTips.append("\nonSucceed");
+                mTvTips.append("\n识别正确,重启APP再次验证");
             }
 
             @Override
             public void onNotMatch(int availableTimes) {
-                mTvTips.append("\nonNotMatch, " + availableTimes + " chances left");
+                mTvTips.append("\n不匹配, 还有" + availableTimes + " 次机会");
             }
 
             @Override
             public void onFailed() {
-                mTvTips.append("\nonFailed");
+                mTvTips.append("\n识别失败，重启APP进行重试");
             }
         });
     }
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void release(View view) {
-        mTvTips.append("\nrelease by click");
+        mTvTips.append("\n放弃指纹识别，重启APP再次验证");
         mFingerprintIdentify.cancelIdentify();
     }
 }

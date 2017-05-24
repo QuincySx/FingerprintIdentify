@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="release"
-        android:text="Release Fingerprint"
+        android:text="停止识别指纹"
         android:textSize="13sp"/>
 
     <TextView
