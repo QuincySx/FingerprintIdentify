@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FingerprintIdentify.iml" filepath="$PROJECT_DIR$/FingerprintIdentify.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FingerprintIdentify.iml" filepath="$PROJECT_DIR$/FingerprintIdentify.iml" />
       <module fileurl="file://$PROJECT_DIR$/FingerprintIdentifyDemo/FingerprintIdentifyDemo.iml" filepath="$PROJECT_DIR$/FingerprintIdentifyDemo/FingerprintIdentifyDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FingerprintIdentifyDemo/FingerprintIdentifyDemo.iml" filepath="$PROJECT_DIR$/FingerprintIdentifyDemo/FingerprintIdentifyDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FingerprintIdentifyLib/FingerprintIdentifyLib.iml" filepath="$PROJECT_DIR$/FingerprintIdentifyLib/FingerprintIdentifyLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/FingerprintIdentifyLib/FingerprintIdentifyLib.iml" filepath="$PROJECT_DIR$/FingerprintIdentifyLib/FingerprintIdentifyLib.iml" />
     </modules>
   </component>
