@@ -1,11 +1,17 @@
 package com.wei.android.lib.fingerprintidentify;
 
+<<<<<<< HEAD
 import android.app.Activity;
 import android.os.Build;
 
 import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint;
 import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint
         .FingerprintIdentifyExceptionListener;
+=======
+import android.content.Context;
+
+import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint;
+>>>>>>> pr/1
 import com.wei.android.lib.fingerprintidentify.impl.AndroidFingerprint;
 import com.wei.android.lib.fingerprintidentify.impl.MeiZuFingerprint;
 import com.wei.android.lib.fingerprintidentify.impl.SamsungFingerprint;
@@ -33,19 +39,36 @@ import com.wei.android.lib.fingerprintidentify.impl.SamsungFingerprint;
  * <p>
  * Created by Awei on 2017/2/8.
  */
-
 public class FingerprintIdentify {
 
-    private BaseFingerprint mFingerprint;
-    private BaseFingerprint mSubFingerprint;
+    protected Context mContext;
+    protected BaseFingerprint.ExceptionListener mExceptionListener;
 
-    public FingerprintIdentify(Activity activity) {
-        this(activity, null);
+    protected boolean mIsSupportAndroidL = false;
+
+    protected BaseFingerprint mFingerprint;
+    protected BaseFingerprint mSubFingerprint;
+
+    public FingerprintIdentify(Context context) {
+        mContext = context;
     }
 
+    public void setSupportAndroidL(boolean supportAndroidL) {
+        mIsSupportAndroidL = supportAndroidL;
+    }
+
+    public void setExceptionListener(BaseFingerprint.ExceptionListener exceptionListener) {
+        mExceptionListener = exceptionListener;
+    }
+
+<<<<<<< HEAD
     public FingerprintIdentify(Activity activity, FingerprintIdentifyExceptionListener
             exceptionListener) {
         AndroidFingerprint androidFingerprint = new AndroidFingerprint(activity, exceptionListener);
+=======
+    public void init() {
+        AndroidFingerprint androidFingerprint = new AndroidFingerprint(mContext, mExceptionListener, mIsSupportAndroidL);
+>>>>>>> pr/1
         if (androidFingerprint.isHardwareEnable()) {
             mSubFingerprint = androidFingerprint;
             if (androidFingerprint.isRegisteredFingerprint()) {
@@ -54,7 +77,7 @@ public class FingerprintIdentify {
             }
         }
 
-        SamsungFingerprint samsungFingerprint = new SamsungFingerprint(activity, exceptionListener);
+        SamsungFingerprint samsungFingerprint = new SamsungFingerprint(mContext, mExceptionListener);
         if (samsungFingerprint.isHardwareEnable()) {
             mSubFingerprint = samsungFingerprint;
             if (samsungFingerprint.isRegisteredFingerprint()) {
@@ -63,6 +86,7 @@ public class FingerprintIdentify {
             }
         }
 
+<<<<<<< HEAD
         if (Build.BRAND.indexOf("Meizu") != -1) {
             MeiZuFingerprint meiZuFingerprint = new MeiZuFingerprint(activity, exceptionListener);
             if (meiZuFingerprint.isHardwareEnable()) {
@@ -70,13 +94,25 @@ public class FingerprintIdentify {
                 if (meiZuFingerprint.isRegisteredFingerprint()) {
                     mFingerprint = meiZuFingerprint;
                 }
+=======
+        MeiZuFingerprint meiZuFingerprint = new MeiZuFingerprint(mContext, mExceptionListener);
+        if (meiZuFingerprint.isHardwareEnable()) {
+            mSubFingerprint = meiZuFingerprint;
+            if (meiZuFingerprint.isRegisteredFingerprint()) {
+                mFingerprint = meiZuFingerprint;
+>>>>>>> pr/1
             }
         }
 
     }
 
+<<<<<<< HEAD
     public void startIdentify(int maxAvailableTimes, BaseFingerprint.FingerprintIdentifyListener
             listener) {
+=======
+    // DO
+    public void startIdentify(int maxAvailableTimes, BaseFingerprint.IdentifyListener listener) {
+>>>>>>> pr/1
         if (!isFingerprintEnable()) {
             return;
         }
@@ -98,6 +134,7 @@ public class FingerprintIdentify {
         mFingerprint.resumeIdentify();
     }
 
+    // GET & SET
     public boolean isFingerprintEnable() {
         return mFingerprint != null && mFingerprint.isEnable();
     }

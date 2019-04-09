@@ -17,16 +17,16 @@
 package com.wei.android.lib.fingerprintidentify.aosp;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.os.CancellationSignal;
 
 import java.security.Signature;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.os.CancellationSignal;
 
 public final class FingerprintManagerCompat {
 
@@ -40,7 +40,7 @@ public final class FingerprintManagerCompat {
         mContext = context;
     }
 
-    static final FingerprintManagerCompatImpl IMPL;
+    private static final FingerprintManagerCompatImpl IMPL;
 
     static {
         IMPL = new Api23FingerprintManagerCompatImpl();
@@ -135,6 +135,7 @@ public final class FingerprintManagerCompat {
                 cancel, AuthenticationCallback callback, Handler handler);
     }
 
+<<<<<<< HEAD
     private static class LegacyFingerprintManagerCompatImpl implements
             FingerprintManagerCompatImpl {
 
@@ -158,6 +159,8 @@ public final class FingerprintManagerCompat {
         }
     }
 
+=======
+>>>>>>> pr/1
     private static class Api23FingerprintManagerCompatImpl implements FingerprintManagerCompatImpl {
 
         public Api23FingerprintManagerCompatImpl() {

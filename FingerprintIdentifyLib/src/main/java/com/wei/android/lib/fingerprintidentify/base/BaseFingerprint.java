@@ -1,6 +1,8 @@
 package com.wei.android.lib.fingerprintidentify.base;
 
-import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 /**
  * Copyright (c) 2017 Awei
@@ -27,35 +29,38 @@ import android.app.Activity;
  */
 public abstract class BaseFingerprint {
 
-    protected Activity mActivity;
-    private FingerprintIdentifyListener mIdentifyListener;
-    private FingerprintIdentifyExceptionListener mExceptionListener;
+    protected Context mContext;
+
+    private Handler mHandler;
+    private IdentifyListener mIdentifyListener;
+    private ExceptionListener mExceptionListener;
 
     private int mNumberOfFailures = 0;                      // number of failures
     private int mMaxAvailableTimes = 3;                     // the most available times
+
     private boolean mIsHardwareEnable = false;              // if the phone equipped fingerprint hardware
     private boolean mIsRegisteredFingerprint = false;       // if the phone has any fingerprints
-    private boolean mIsCanceledIdentify = false;            // if canceled identify
-    private boolean mIsCalledStartIdentify = false;         // if started identify
 
-    public BaseFingerprint(Activity activity, FingerprintIdentifyExceptionListener exceptionListener) {
-        mActivity = activity;
+    private boolean mIsCalledStartIdentify = false;         // if started identify
+    private boolean mIsCanceledIdentify = false;            // if canceled identify
+
+    public BaseFingerprint(Context context, ExceptionListener exceptionListener) {
+        mContext = context;
         mExceptionListener = exceptionListener;
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
-    public void startIdentify(int maxAvailableTimes, FingerprintIdentifyListener listener) {
+    // DO
+    public void startIdentify(int maxAvailableTimes, IdentifyListener identifyListener) {
         mMaxAvailableTimes = maxAvailableTimes;
+        mIdentifyListener = identifyListener;
         mIsCalledStartIdentify = true;
-        mIdentifyListener = listener;
         mIsCanceledIdentify = false;
         mNumberOfFailures = 0;
 
         doIdentify();
     }
 
-    /**
-     * Continue to call fingerprint identify, keep the number of failures.
-     */
     public void resumeIdentify() {
         if (mIsCalledStartIdentify && mIdentifyListener != null && mNumberOfFailures < mMaxAvailableTimes) {
             mIsCanceledIdentify = false;
@@ -63,47 +68,17 @@ public abstract class BaseFingerprint {
         }
     }
 
-    /**
-     * stop identify and release hardware
-     */
     public void cancelIdentify() {
         mIsCanceledIdentify = true;
         doCancelIdentify();
     }
 
-    /**
-     * is that need to recall doIdentify again when not match
-     *
-     * @return needed
-     */
-    protected boolean needToCallDoIdentifyAgainAfterNotMatch() {
-        return true;
-    }
-
-    /**
-     * catch the all exceptions
-     *
-     * @param exception exception
-     */
-    protected void onCatchException(Throwable exception) {
-        if (mExceptionListener != null && exception != null) {
-            mExceptionListener.onCatchException(exception);
-        }
-    }
-
-    /**
-     * do identify actually
-     */
+    // IMPL
     protected abstract void doIdentify();
 
-    /**
-     * do cancel identify actually
-     */
     protected abstract void doCancelIdentify();
 
-    /**
-     * verification passed
-     */
+    // CALLBACK
     protected void onSucceed() {
         if (mIsCanceledIdentify) {
             return;
@@ -112,7 +87,7 @@ public abstract class BaseFingerprint {
         mNumberOfFailures = mMaxAvailableTimes;
 
         if (mIdentifyListener != null) {
-            mActivity.runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mIdentifyListener.onSucceed();
@@ -123,9 +98,6 @@ public abstract class BaseFingerprint {
         cancelIdentify();
     }
 
-    /**
-     * fingerprint not match
-     */
     protected void onNotMatch() {
         if (mIsCanceledIdentify) {
             return;
@@ -133,10 +105,11 @@ public abstract class BaseFingerprint {
 
         if (++mNumberOfFailures < mMaxAvailableTimes) {
             if (mIdentifyListener != null) {
-                mActivity.runOnUiThread(new Runnable() {
+                final int chancesLeft = mMaxAvailableTimes - mNumberOfFailures;
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mIdentifyListener.onNotMatch(mMaxAvailableTimes - mNumberOfFailures);
+                        mIdentifyListener.onNotMatch(chancesLeft);
                     }
                 });
             }
@@ -148,24 +121,27 @@ public abstract class BaseFingerprint {
             return;
         }
 
-        onFailed();
+        onFailed(false);
     }
 
-    /**
-     * verification failed
-     */
-    protected void onFailed() {
+    protected void onFailed(final boolean isDeviceLocked) {
         if (mIsCanceledIdentify) {
             return;
         }
 
+        final boolean isStartFailedByDeviceLocked = isDeviceLocked && mNumberOfFailures == 0;
+
         mNumberOfFailures = mMaxAvailableTimes;
 
         if (mIdentifyListener != null) {
-            mActivity.runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mIdentifyListener.onFailed();
+                    if (isStartFailedByDeviceLocked) {
+                        mIdentifyListener.onStartFailedByDeviceLocked();
+                    } else {
+                        mIdentifyListener.onFailed(isDeviceLocked);
+                    }
                 }
             });
         }
@@ -173,66 +149,53 @@ public abstract class BaseFingerprint {
         cancelIdentify();
     }
 
-    /**
-     * is that hardware detected and has enrolled fingerprints
-     *
-     * @return yes
-     */
+    protected void onCatchException(Throwable exception) {
+        if (mExceptionListener != null && exception != null) {
+            mExceptionListener.onCatchException(exception);
+        }
+    }
+
+    // GET & SET
     public boolean isEnable() {
         return mIsHardwareEnable && mIsRegisteredFingerprint;
     }
 
-    /**
-     * is that hardware detected
-     *
-     * @return yes
-     */
     public boolean isHardwareEnable() {
         return mIsHardwareEnable;
     }
 
-    /**
-     * save the value of hardware detected
-     *
-     * @param hardwareEnable detected
-     */
     protected void setHardwareEnable(boolean hardwareEnable) {
         mIsHardwareEnable = hardwareEnable;
     }
 
-    /**
-     * is that has enrolled fingerprints
-     *
-     * @return yes
-     */
     public boolean isRegisteredFingerprint() {
         return mIsRegisteredFingerprint;
     }
 
-    /**
-     * save the value of enrolled fingerprints
-     *
-     * @param registeredFingerprint enrolled
-     */
     protected void setRegisteredFingerprint(boolean registeredFingerprint) {
         mIsRegisteredFingerprint = registeredFingerprint;
     }
 
-    /**
-     * identify callback
-     */
-    public interface FingerprintIdentifyListener {
+    // OTHER
+    protected void runOnUiThread(Runnable runnable) {
+        mHandler.post(runnable);
+    }
+
+    protected boolean needToCallDoIdentifyAgainAfterNotMatch() {
+        return true;
+    }
+
+    public interface IdentifyListener {
         void onSucceed();
 
         void onNotMatch(int availableTimes);
 
-        void onFailed();
+        void onFailed(boolean isDeviceLocked);
+
+        void onStartFailedByDeviceLocked();
     }
 
-    /**
-     * exception callback
-     */
-    public interface FingerprintIdentifyExceptionListener {
+    public interface ExceptionListener {
         void onCatchException(Throwable exception);
     }
 }

@@ -1,10 +1,13 @@
 package com.wei.android.lib.fingerprintidentify.impl;
 
-import android.app.Activity;
-import android.support.v4.os.CancellationSignal;
+import android.content.Context;
+import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
 
 import com.wei.android.lib.fingerprintidentify.aosp.FingerprintManagerCompat;
 import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint;
+
+import androidx.core.os.CancellationSignal;
 
 /**
  * Copyright (c) 2017 Awei
@@ -34,11 +37,17 @@ public class AndroidFingerprint extends BaseFingerprint {
     private CancellationSignal mCancellationSignal;
     private FingerprintManagerCompat mFingerprintManagerCompat;
 
-    public AndroidFingerprint(Activity activity, FingerprintIdentifyExceptionListener exceptionListener) {
-        super(activity, exceptionListener);
+    public AndroidFingerprint(Context context, ExceptionListener exceptionListener, boolean iSupportAndroidL) {
+        super(context, exceptionListener);
+
+        if (!iSupportAndroidL) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                return;
+            }
+        }
 
         try {
-            mFingerprintManagerCompat = FingerprintManagerCompat.from(activity);
+            mFingerprintManagerCompat = FingerprintManagerCompat.from(mContext);
             setHardwareEnable(mFingerprintManagerCompat.isHardwareDetected());
             setRegisteredFingerprint(mFingerprintManagerCompat.hasEnrolledFingerprints());
         } catch (Throwable e) {
@@ -66,12 +75,19 @@ public class AndroidFingerprint extends BaseFingerprint {
                 @Override
                 public void onAuthenticationError(int errMsgId, CharSequence errString) {
                     super.onAuthenticationError(errMsgId, errString);
-                    onFailed();
+
+                    if (errMsgId == FingerprintManager.FINGERPRINT_ERROR_CANCELED ||
+                            errMsgId == FingerprintManager.FINGERPRINT_ERROR_USER_CANCELED) {
+                        return;
+                    }
+
+                    onFailed(errMsgId == FingerprintManager.FINGERPRINT_ERROR_LOCKOUT ||
+                            errMsgId == FingerprintManager.FINGERPRINT_ERROR_LOCKOUT_PERMANENT);
                 }
             }, null);
         } catch (Throwable e) {
             onCatchException(e);
-            onFailed();
+            onFailed(false);
         }
     }
 

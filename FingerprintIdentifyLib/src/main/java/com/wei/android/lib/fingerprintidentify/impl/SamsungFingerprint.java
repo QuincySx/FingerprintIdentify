@@ -1,9 +1,10 @@
 package com.wei.android.lib.fingerprintidentify.impl;
 
-import android.app.Activity;
+import android.content.Context;
 
 import com.samsung.android.sdk.pass.Spass;
 import com.samsung.android.sdk.pass.SpassFingerprint;
+import com.samsung.android.sdk.pass.SpassInvalidStateException;
 import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint;
 
 /**
@@ -34,13 +35,13 @@ public class SamsungFingerprint extends BaseFingerprint {
     private int mResultCode = -1;
     private SpassFingerprint mSpassFingerprint;
 
-    public SamsungFingerprint(Activity activity, FingerprintIdentifyExceptionListener exceptionListener) {
-        super(activity, exceptionListener);
+    public SamsungFingerprint(Context context, ExceptionListener exceptionListener) {
+        super(context, exceptionListener);
 
         try {
             Spass spass = new Spass();
-            spass.initialize(mActivity);
-            mSpassFingerprint = new SpassFingerprint(activity);
+            spass.initialize(mContext);
+            mSpassFingerprint = new SpassFingerprint(mContext);
             setHardwareEnable(spass.isFeatureEnabled(Spass.DEVICE_FINGERPRINT));
             setRegisteredFingerprint(mSpassFingerprint.hasRegisteredFinger());
         } catch (Throwable e) {
@@ -50,7 +51,7 @@ public class SamsungFingerprint extends BaseFingerprint {
 
     @Override
     protected void doIdentify() {
-        mActivity.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -78,6 +79,8 @@ public class SamsungFingerprint extends BaseFingerprint {
                                     onSucceed();
                                     break;
 
+                                case SpassFingerprint.STATUS_SENSOR_FAILED:
+                                case SpassFingerprint.STATUS_OPERATION_DENIED:
                                 case SpassFingerprint.STATUS_TIMEOUT_FAILED:
                                 case SpassFingerprint.STATUS_BUTTON_PRESSED:
                                 case SpassFingerprint.STATUS_QUALITY_FAILED:
@@ -86,15 +89,29 @@ public class SamsungFingerprint extends BaseFingerprint {
                                     onNotMatch();
                                     break;
 
+                                case SpassFingerprint.STATUS_USER_CANCELLED:
+                                    // do nothing
+                                    break;
+
                                 default:
-                                    onFailed();
+                                    onFailed(false);
                                     break;
                             }
                         }
                     });
                 } catch (Throwable e) {
-                    onCatchException(e);
-                    onFailed();
+                    if (e instanceof SpassInvalidStateException) {
+                        SpassInvalidStateException stateException = (SpassInvalidStateException) e;
+                        if (stateException.getType() == 1) {
+                            onFailed(true);
+                        } else {
+                            onCatchException(e);
+                            onFailed(false);
+                        }
+                    } else {
+                        onCatchException(e);
+                        onFailed(false);
+                    }
                 }
             }
         });
@@ -102,7 +119,7 @@ public class SamsungFingerprint extends BaseFingerprint {
 
     @Override
     protected void doCancelIdentify() {
-        mActivity.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
