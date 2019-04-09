@@ -27,15 +27,9 @@ import java.security.Signature;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 
-<<<<<<< HEAD
-import static android.content.Context.FINGERPRINT_SERVICE;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-=======
-import androidx.annotation.RequiresApi;
-import androidx.annotation.RestrictTo;
-
-import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
->>>>>>> pr/1
+import android.support.annotation.RequiresApi;
+import android.support.annotation.RestrictTo;
 
 @RequiresApi(23)
 @TargetApi(23)
@@ -43,11 +37,7 @@ import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 public final class FingerprintManagerCompatApi23 {
 
     private static FingerprintManager getFingerprintManagerOrNull(Context context) {
-<<<<<<< HEAD
-        return (FingerprintManager) context.getSystemService(FINGERPRINT_SERVICE);
-=======
         return (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
->>>>>>> pr/1
     }
 
     public static boolean hasEnrolledFingerprints(Context context) {
@@ -64,12 +54,7 @@ public final class FingerprintManagerCompatApi23 {
             cancel, AuthenticationCallback callback, Handler handler) {
         final FingerprintManager fp = getFingerprintManagerOrNull(context);
         if (fp != null) {
-<<<<<<< HEAD
-            fp.authenticate(wrapCryptoObject(crypto), (android.os.CancellationSignal) cancel,
-                    flags, wrapCallback(callback), handler);
-=======
             fp.authenticate(wrapCryptoObject(crypto), (CancellationSignal) cancel, flags, wrapCallback(callback), handler);
->>>>>>> pr/1
         }
     }
 
